@@ -144,12 +144,12 @@
                                         <span>Zjazd ${nrZjazdu}</span>
                                         <span class="zjazd-dates">${zakresDat}</span>
                                     </div>
-                                    <span class="toggle-icon" id="icon-${nrZjazdu}">▼</span>
+                                    <span class="toggle-icon" id="icon-${nrZjazdu}" style="transform: rotate(-90deg);">▼</span>
                                 </div>
                             `;
 
-                            // Kontener na zajęcia (domyślnie wyświetlany: block)
-                            let zawartoscHTML = `<div class="zjazd-content" id="zjazd-content-${nrZjazdu}" style="display: block;">`;
+                            // Kontener na zajęcia (domyślnie schowany: none)
+                            let zawartoscHTML = `<div class="zjazd-content" id="zjazd-content-${nrZjazdu}" style="display: none;">`;
                             
                             let obecnaData = '';
 
