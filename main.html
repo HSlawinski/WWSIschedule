@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mój Plan Zajęć</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+</head>
+<body data-theme="dark">
+
+    <header>
+        <h1>Z-201 🎓</h1>
+        <button id="theme-toggle">☀️</button>
+    </header>
+
+    <div id="app">
+        <div class="loader">Ładowanie najświeższego planu...</div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. WKLEJ TU SWÓJ LINK CSV Z GOOGLE SHEETS!
+        // ==========================================
+        const urlGoogleSheets = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS0Egljaq9wqp3oBnK50-ynJ4mygw-Rf0z19qQB05lmVljVljsjLs-4p4L8sNZh0FZUxHr8WTYKKqOi/pub?output=csv';
+
+        // Obsługa trybu ciemnego (domyślnie ciemny, chyba że ktoś wyraźnie zapisał jasny)
+        const themeToggle = document.getElementById('theme-toggle');
+        let isDark = localStorage.getItem('theme') !== 'light'; 
+        
+        if(!isDark) document.body.removeAttribute('data-theme');
+        themeToggle.textContent = isDark ? '☀️' : '🌙';
+
+        themeToggle.addEventListener('click', () => {
+            isDark = !isDark;
+            if (isDark) {
+                document.body.setAttribute('data-theme', 'dark');
+            } else {
+                document.body.removeAttribute('data-theme');
+            }
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeToggle.textContent = isDark ? '☀️' : '🌙';
+        });
+
+        // Globalna funkcja do zwijania/rozwijania zjazdów
+        window.toggleZjazd = function(nrZjazdu) {
+            const content = document.getElementById(`zjazd-content-${nrZjazdu}`);
+            const icon = document.getElementById(`icon-${nrZjazdu}`);
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.style.transform = 'rotate(0deg)'; // Strzałka w dół
+            } else {
+                content.style.display = 'none';
+                icon.style.transform = 'rotate(-90deg)'; // Strzałka w lewo
+            }
+        };
+
+        function getTypZajecHTML(nazwa) {
+            const lower = nazwa.toLowerCase();
+            if (lower.includes('wykł')) return `<span class="badge badge-wykl">WYKŁAD</span>`;
+            if (lower.includes('ćw')) return `<span class="badge badge-cw">ĆWICZENIA</span>`;
+            if (lower.includes('lab')) return `<span class="badge badge-lab">LABORATORIUM</span>`;
+            return '';
+        }
+
+        function cleanNazwa(nazwa) {
+            return nazwa.replace(/wykł\.|ćw\.|lab\./gi, '').trim();
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const app = document.getElementById('app');
+                
+                const zjazdyResponse = await fetch('zjazdy.json');
+                if (!zjazdyResponse.ok) throw new Error('Nie znaleziono pliku zjazdy.json');
+                const zjazdyDaty = await zjazdyResponse.json();
+
+                Papa.parse(urlGoogleSheets, {
+                    download: true,
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        const planDane = results.data;
+                        let suroweZajecia = [];
+
+                        planDane.forEach(surowyWiersz => {
+                            const wiersz = {};
+                            for (let key in surowyWiersz) {
+                                let czystyKlucz = key.trim().toLowerCase().replace('ń', 'n').replace('ź', 'z');
+                                wiersz[czystyKlucz] = surowyWiersz[key];
+                            }
+
+                            if(!wiersz.zjazdy || !wiersz.dzien) return;
+
+                            const zjazdyLista = String(wiersz.zjazdy).split(',').map(z => z.trim());
+                            const czystyDzien = String(wiersz.dzien).trim();
+
+                            zjazdyLista.forEach(nrZjazdu => {
+                                if(zjazdyDaty[nrZjazdu] && zjazdyDaty[nrZjazdu][czystyDzien]) {
+                                    suroweZajecia.push({
+                                        zjazd: parseInt(nrZjazdu),
+                                        dzien: czystyDzien,
+                                        data: zjazdyDaty[nrZjazdu][czystyDzien],
+                                        od: String(wiersz.od || '').trim().replace('.', ':').padStart(5, '0'),
+                                        do: String(wiersz.do || '').trim().replace('.', ':').padStart(5, '0'),
+                                        przedmiot: String(wiersz.przedmiot || '').trim(),
+                                        sala: String(wiersz.sala || '').trim()
+                                    });
+                                }
+                            });
+                        });
+
+                        suroweZajecia.sort((a, b) => {
+                            if (a.zjazd !== b.zjazd) return a.zjazd - b.zjazd;
+                            if (a.data !== b.data) return a.data.localeCompare(b.data);
+                            return a.od.localeCompare(b.od);
+                        });
+
+                        app.innerHTML = ''; 
+
+                        // Grupujemy dane według numeru zjazdu, żeby ładnie zbudować zwijane panele
+                        const zjazdyPogrupowane = {};
+                        suroweZajecia.forEach(zajecia => {
+                            if (!zjazdyPogrupowane[zajecia.zjazd]) {
+                                zjazdyPogrupowane[zajecia.zjazd] = [];
+                            }
+                            zjazdyPogrupowane[zajecia.zjazd].push(zajecia);
+                        });
+
+                        // Renderujemy każdego zjazdu osobną paczkę
+                        for (const [nrZjazdu, zajeciaWzjezdzie] of Object.entries(zjazdyPogrupowane)) {
+                            
+                            // Wyciągamy pierwszą i ostatnią datę dla tego zjazdu, by wyświetlić w nagłówku
+                            const dostepneDaty = Object.values(zjazdyDaty[nrZjazdu]).sort();
+                            const dataStart = dostepneDaty[0].split('-'); // np. ["2026", "02", "20"]
+                            const dataKoniec = dostepneDaty[dostepneDaty.length - 1].split('-'); // np. ["2026", "02", "22"]
+                            const zakresDat = `(${dataStart[2]}.${dataStart[1]} - ${dataKoniec[2]}.${dataKoniec[1]}.${dataKoniec[0]})`;
+
+                            // Generujemy klikalny nagłówek zjazdu ze strzałką i datą
+                            app.innerHTML += `
+                                <div class="zjazd-header" onclick="toggleZjazd(${nrZjazdu})">
+                                    <div class="zjazd-title-container">
+                                        <span>Zjazd ${nrZjazdu}</span>
+                                        <span class="zjazd-dates">${zakresDat}</span>
+                                    </div>
+                                    <span class="toggle-icon" id="icon-${nrZjazdu}">▼</span>
+                                </div>
+                            `;
+
+                            // Kontener na zajęcia (domyślnie wyświetlany: block)
+                            let zawartoscHTML = `<div class="zjazd-content" id="zjazd-content-${nrZjazdu}" style="display: block;">`;
+                            
+                            let obecnaData = '';
+
+                            zajeciaWzjezdzie.forEach(zajecia => {
+                                if (zajecia.data !== obecnaData) {
+                                    const parts = zajecia.data.split('-');
+                                    const dataFormat = `${parts[2]}.${parts[1]}.${parts[0]}`;
+                                    zawartoscHTML += `<div class="dzien-header">${zajecia.dzien} <span style="font-weight:400; font-size:0.9rem;">(${dataFormat})</span></div>`;
+                                    obecnaData = zajecia.data;
+                                }
+
+                                const typHTML = getTypZajecHTML(zajecia.przedmiot);
+                                const czystaNazwa = cleanNazwa(zajecia.przedmiot);
+
+                                zawartoscHTML += `
+                                    <div class="zajecia-card">
+                                        <div class="czas-col">
+                                            <div class="czas-start">${zajecia.od}</div>
+                                            <div class="czas-koniec">${zajecia.do}</div>
+                                        </div>
+                                        <div class="info-col">
+                                            <h3 class="przedmiot-tytul">${czystaNazwa}</h3>
+                                            <div class="tags-container">
+                                                <span class="badge badge-sala">📍 Sala ${zajecia.sala}</span>
+                                                ${typHTML}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+
+                            zawartoscHTML += `</div>`; // Zamykamy kontener
+                            app.innerHTML += zawartoscHTML; // Wrzucamy do apki
+                        }
+
+                        if (suroweZajecia.length === 0) {
+                            app.innerHTML = '<div class="loader">Brak zajęć do wyświetlenia.</div>';
+                        }
+                    },
+                    error: function(err) {
+                        document.getElementById('app').innerHTML = `<div class="loader" style="color:red;">Błąd pobierania arkusza: ${err.message}</div>`;
+                    }
+                });
+            } catch (err) {
+                document.getElementById('app').innerHTML = `<div class="loader" style="color:red;">Błąd: ${err.message}</div>`;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+/* Zmienne CSS - Paleta kolorów WWSI (Granat i Pomarańcz) */
+:root {
+    /* Jasny motyw (Light Mode) */
+    --bg-color: #f0f4f8; /* Bardzo delikatny, chłodny szaro-niebieski */
+    --text-main: #102a43; /* Głęboki, ciemny granat (zamiast zwykłego czarnego) */
+    --text-muted: #627d98;
+    --card-bg: #ffffff;
+    --accent: #f26522; /* Charakterystyczny pomarańcz WWSI */
+    --accent-hover: #d95316;
+    --border-color: #d9e2ec;
+    
+    /* Pigułki z typami zajęć (dopasowane) */
+    --tag-wykl: #e0e8f9;
+    --tag-wykl-text: #243b53;
+    --tag-cw: #ffeedb;
+    --tag-cw-text: #cb5300;
+    --tag-lab: #d1f4e0;
+    --tag-lab-text: #0e5c2e;
+}
+
+/* Ciemny motyw (Dark Mode) - domyślny */
+[data-theme="dark"] {
+    --bg-color: #0b1727; /* Ekstremalnie głęboki granat WWSI */
+    --text-main: #f0f4f8; 
+    --text-muted: #9fb3c8;
+    --card-bg: #142538; /* Lekko jaśniejszy granat dla samych kart zajęć */
+    --accent: #ff7b33; /* Żywy, jarzący się pomarańcz WWSI (dostosowany do ciemnego tła) */
+    --accent-hover: #ffa066;
+    --border-color: #243b53;
+    
+    /* Pigułki w trybie ciemnym */
+    --tag-wykl: #1c3249;
+    --tag-wykl-text: #829ab1;
+    --tag-cw: #4a2810;
+    --tag-cw-text: #ffb880;
+    --tag-lab: #0e3b1f;
+    --tag-lab-text: #74cfa0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Nagłówek apki */
+header {
+    background-color: var(--card-bg);
+    padding: 15px 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 2px solid var(--accent); /* Cienka pomarańczowa linia na dole nagłówka */
+}
+
+header h1 { 
+    margin: 0; 
+    font-size: 1.3rem; 
+    font-weight: 800; 
+    letter-spacing: 0.5px;
+}
+
+#theme-toggle { 
+    background: none; 
+    border: none; 
+    font-size: 1.5rem; 
+    cursor: pointer; 
+    padding: 5px; 
+    transition: transform 0.2s;
+}
+
+#theme-toggle:active {
+    transform: scale(0.9);
+}
+
+#app { 
+    max-width: 600px; 
+    margin: 0 auto; 
+    padding: 20px; 
+}
+
+/* Rozwijane nagłówki Zjazdów */
+/* --- NOWY STYL ROZWIJANYCH NAGŁÓWKÓW ZJAZDÓW --- */
+
+.zjazd-header {
+    font-size: 1.3rem;
+    font-weight: 800;
+    /* Zwiększamy marginesy, żeby oddzielić zjazdy od siebie */
+    margin: 30px 0 15px 0;
+    /* Kolor tekstu głównego */
+    color: var(--text-main);
+    /* Usuwamy starą linię na dole */
+    border-bottom: none;
+    
+    /* Nowy wygląd belki */
+    background-color: var(--card-bg);
+    padding: 15px 20px;
+    border-radius: 12px;
+    /* Gruby, pomarańczowy akcent WWSI z lewej strony */
+    border-left: 8px solid var(--accent);
+    /* Delikatny cień dla efektu 3D */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    /* Płynne przejścia przy najechaniu */
+    transition: all 0.2s ease-in-out;
+}
+
+/* Efekt po najechaniu myszką */
+.zjazd-header:hover { 
+    /* Lekkie uniesienie i zwiększenie cienia */
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    /* Subtelna zmiana tła, żeby pokazać interaktywność */
+    filter: brightness(98%);
+}
+/* W trybie ciemnym rozjaśniamy zamiast przyciemniać */
+[data-theme="dark"] .zjazd-header:hover {
+    filter: brightness(110%);
+}
+
+
+.zjazd-title-container {
+    display: flex;
+    align-items: baseline; /* Wyrównujemy tekst do linii */
+    gap: 15px;
+    flex-wrap: wrap; /* Żeby na małych telefonach daty spadły niżej */
+}
+
+/* Nowy styl dat obok nagłówka */
+.zjazd-dates {
+    font-size: 0.9rem;
+    color: var(--accent); /* Data w kolorze akcentu (pomarańcz) */
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    /* Usuwamy tło i ramkę, teraz jest czystszym tekstem */
+    background: none;
+    padding: 0;
+    border: none;
+    opacity: 0.9;
+}
+
+.toggle-icon {
+    /* Powiększamy strzałkę */
+    font-size: 1.2rem;
+    color: var(--accent); /* Strzałka też pomarańczowa */
+    transition: transform 0.3s ease cubic-bezier(0.4, 0.0, 0.2, 1); /* Bardziej sprężysta animacja */
+    background: var(--bg-color);
+    padding: 8px;
+    border-radius: 50%;
+    line-height: 1;
+    height: 20px;
+    width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Stylizacja Dnia */
+.dzien-header {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 20px 0 10px 0;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Karty zajęć */
+.zajecia-card {
+    display: flex;
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+    border-left: 5px solid var(--accent); /* Wyraźny pomarańczowy akcent boczny */
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.zajecia-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+}
+
+.zajecia-card:active {
+    transform: scale(0.98);
+}
+
+.czas-col {
+    min-width: 65px;
+    text-align: right;
+    padding-right: 15px;
+    border-right: 2px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.czas-start { font-weight: 800; font-size: 1.05rem; }
+.czas-koniec { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; font-weight: 600; }
+
+.info-col { padding-left: 15px; flex-grow: 1; }
+.przedmiot-tytul { font-weight: 700; font-size: 1.05rem; margin: 0 0 10px 0; line-height: 1.4; }
+
+.tags-container { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.badge { 
+    padding: 4px 12px; 
+    border-radius: 20px; 
+    font-size: 0.75rem; 
+    font-weight: 800; 
+    letter-spacing: 0.5px; 
+}
+
+.badge-sala { 
+    background-color: var(--bg-color); 
+    color: var(--text-main); 
+    border: 1px solid var(--border-color); 
+}
+
+.badge-wykl { background-color: var(--tag-wykl); color: var(--tag-wykl-text); }
+.badge-cw { background-color: var(--tag-cw); color: var(--tag-cw-text); }
+.badge-lab { background-color: var(--tag-lab); color: var(--tag-lab-text); }
+
+.loader { text-align: center; padding: 50px; color: var(--text-muted); font-weight: bold; }
