@@ -1,15 +1,15 @@
 /* Zmienne CSS - Paleta kolorów WWSI (Granat i Pomarańcz) */
 :root {
     /* Jasny motyw (Light Mode) */
-    --bg-color: #f0f4f8; /* Bardzo delikatny, chłodny szaro-niebieski */
-    --text-main: #102a43; /* Głęboki, ciemny granat (zamiast zwykłego czarnego) */
+    --bg-color: #f0f4f8; 
+    --text-main: #102a43; 
     --text-muted: #627d98;
     --card-bg: #ffffff;
-    --accent: #f26522; /* Charakterystyczny pomarańcz WWSI */
+    --accent: #f26522; 
     --accent-hover: #d95316;
     --border-color: #d9e2ec;
     
-    /* Pigułki z typami zajęć (dopasowane) */
+    /* Pigułki z typami zajęć */
     --tag-wykl: #e0e8f9;
     --tag-wykl-text: #243b53;
     --tag-cw: #ffeedb;
@@ -20,11 +20,11 @@
 
 /* Ciemny motyw (Dark Mode) - domyślny */
 [data-theme="dark"] {
-    --bg-color: #0b1727; /* Ekstremalnie głęboki granat WWSI */
+    --bg-color: #0b1727; 
     --text-main: #f0f4f8; 
     --text-muted: #9fb3c8;
-    --card-bg: #142538; /* Lekko jaśniejszy granat dla samych kart zajęć */
-    --accent: #ff7b33; /* Żywy, jarzący się pomarańcz WWSI (dostosowany do ciemnego tła) */
+    --card-bg: #142538; 
+    --accent: #ff7b33; 
     --accent-hover: #ffa066;
     --border-color: #243b53;
     
@@ -57,7 +57,7 @@ header {
     position: sticky;
     top: 0;
     z-index: 100;
-    border-bottom: 2px solid var(--accent); /* Cienka pomarańczowa linia na dole nagłówka */
+    border-bottom: 2px solid var(--accent); 
 }
 
 header h1 { 
@@ -86,26 +86,18 @@ header h1 {
     padding: 20px; 
 }
 
-/* Rozwijane nagłówki Zjazdów */
 /* --- NOWY STYL ROZWIJANYCH NAGŁÓWKÓW ZJAZDÓW --- */
-
 .zjazd-header {
     font-size: 1.3rem;
     font-weight: 800;
-    /* Zwiększamy marginesy, żeby oddzielić zjazdy od siebie */
     margin: 30px 0 15px 0;
-    /* Kolor tekstu głównego */
     color: var(--text-main);
-    /* Usuwamy starą linię na dole */
     border-bottom: none;
     
-    /* Nowy wygląd belki */
     background-color: var(--card-bg);
     padding: 15px 20px;
     border-radius: 12px;
-    /* Gruby, pomarańczowy akcent WWSI z lewej strony */
     border-left: 8px solid var(--accent);
-    /* Delikatny cień dla efektu 3D */
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 
     display: flex;
@@ -113,39 +105,31 @@ header h1 {
     align-items: center;
     cursor: pointer;
     user-select: none;
-    /* Płynne przejścia przy najechaniu */
     transition: all 0.2s ease-in-out;
 }
 
-/* Efekt po najechaniu myszką */
 .zjazd-header:hover { 
-    /* Lekkie uniesienie i zwiększenie cienia */
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    /* Subtelna zmiana tła, żeby pokazać interaktywność */
     filter: brightness(98%);
 }
-/* W trybie ciemnym rozjaśniamy zamiast przyciemniać */
 [data-theme="dark"] .zjazd-header:hover {
     filter: brightness(110%);
 }
 
-
 .zjazd-title-container {
     display: flex;
-    align-items: baseline; /* Wyrównujemy tekst do linii */
+    align-items: baseline; 
     gap: 15px;
-    flex-wrap: wrap; /* Żeby na małych telefonach daty spadły niżej */
+    flex-wrap: wrap; 
 }
 
-/* Nowy styl dat obok nagłówka */
 .zjazd-dates {
     font-size: 0.9rem;
-    color: var(--accent); /* Data w kolorze akcentu (pomarańcz) */
+    color: var(--accent); 
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    /* Usuwamy tło i ramkę, teraz jest czystszym tekstem */
     background: none;
     padding: 0;
     border: none;
@@ -153,10 +137,9 @@ header h1 {
 }
 
 .toggle-icon {
-    /* Powiększamy strzałkę */
     font-size: 1.2rem;
-    color: var(--accent); /* Strzałka też pomarańczowa */
-    transition: transform 0.3s ease cubic-bezier(0.4, 0.0, 0.2, 1); /* Bardziej sprężysta animacja */
+    color: var(--accent); 
+    transition: transform 0.3s ease cubic-bezier(0.4, 0.0, 0.2, 1); 
     background: var(--bg-color);
     padding: 8px;
     border-radius: 50%;
@@ -186,7 +169,7 @@ header h1 {
     padding: 15px;
     margin-bottom: 12px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.04);
-    border-left: 5px solid var(--accent); /* Wyraźny pomarańczowy akcent boczny */
+    border-left: 5px solid var(--accent); 
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -236,3 +219,49 @@ header h1 {
 .badge-lab { background-color: var(--tag-lab); color: var(--tag-lab-text); }
 
 .loader { text-align: center; padding: 50px; color: var(--text-muted); font-weight: bold; }
+
+/* ========================================================
+   WYJĄTKI DLA KOMUNIKATÓW RSS (Bazujące na klasach zjazdów) 
+   ======================================================== */
+
+#komunikaty-rss {
+    margin-bottom: 40px;
+}
+
+#komunikaty-rss .zjazd-header {
+    border-left-color: #e74c3c;
+}
+
+#rss-count {
+    color: #e74c3c;
+}
+
+#rss-content {
+    padding-top: 10px;
+}
+
+.zajecia-card.rss-card {
+    border-left-color: #e74c3c;
+}
+
+.rss-card .czas-col {
+    min-width: 80px;
+}
+
+.rss-card .czas-start {
+    font-size: 0.9rem;
+}
+
+.rss-card .przedmiot-tytul {
+    margin-bottom: 0;
+}
+
+.rss-card .przedmiot-tytul a {
+    color: var(--text-main);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.rss-card .przedmiot-tytul a:hover {
+    color: var(--accent-hover);
+}
