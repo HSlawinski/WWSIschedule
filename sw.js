@@ -1,30 +1,57 @@
-const CACHE_NAME = 'z201-plan-v1';
+const CACHE_NAME = 'z201-plan-v2'; 
+const DYNAMIC_CACHE = 'z201-dynamic-v2';
+
+// To zapisujemy na twardo przy pierwszej instalacji
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
     './style.css',
     './script.js',
-    './zjazdy.json'
+    './zjazdy.json',
+    './manifest.json',
+    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css' // Dodane FontAwesome!
 ];
 
-// Instalacja Service Workera i zapisywanie plików do pamięci podręcznej
+// Instalacja
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
-        .then(cache => {
-            console.log('Zapisano pliki w pamięci podręcznej (Cache)');
-            return cache.addAll(ASSETS_TO_CACHE);
-        })
+        .then(cache => cache.addAll(ASSETS_TO_CACHE))
+        .then(() => self.skipWaiting()) // Wymuś natychmiastową aktualizację
     );
 });
 
-// Zwracanie plików z pamięci podręcznej, gdy nie ma internetu
+// Sprzątanie starych śmieci (np. wersji v1)
+self.addEventListener('activate', event => {
+    event.waitUntil(
+        caches.keys().then(keys => {
+            return Promise.all(keys
+                .filter(key => key !== CACHE_NAME && key !== DYNAMIC_CACHE)
+                .map(key => caches.delete(key))
+            );
+        })
+    );
+    return self.clients.claim();
+});
+
+// GŁÓWNA LOGIKA: Network First (Najpierw Internet, potem Cache)
 self.addEventListener('fetch', event => {
+    // Interesują nas tylko zapytania pobierające dane (GET)
+    if (event.request.method !== 'GET') return;
+
     event.respondWith(
-        caches.match(event.request)
+        fetch(event.request)
         .then(response => {
-            // Zwróć plik z cache, albo pobierz z sieci, jeśli go tam nie ma
-            return response || fetch(event.request);
+            // Mamy internet! Zapisujemy kopię zapasową w tle i oddajemy świeże dane
+            const responseClone = response.clone();
+            caches.open(DYNAMIC_CACHE).then(cache => {
+                cache.put(event.request, responseClone);
+            });
+            return response;
+        })
+        .catch(() => {
+            // Brak internetu (offline)! Wyciągamy ostatnią znaną wersję z pamięci telefonu
+            return caches.match(event.request);
         })
     );
 });
