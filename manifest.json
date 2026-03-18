@@ -1,0 +1,18 @@
+{
+  "short_name": "Z-201",
+  "name": "Plan Zajęć WWSI Z-201",
+  "description": "Harmonogram i komunikaty dla grupy Z-201",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1727",
+  "theme_color": "#142538",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3591/3591658.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}
